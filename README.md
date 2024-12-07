@@ -10,6 +10,7 @@ This is a Python application that supports multiple languages and includes vario
 ## Installation
 
 1. Clone the repository (Or download source code):
+2. 
    git clone https://github.com/nazarhktwitch/EasyRequests
 
    cd EasyRequests
