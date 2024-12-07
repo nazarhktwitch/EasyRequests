@@ -45,7 +45,7 @@ Using Py2Exe:
 
 Nuitka:
 
-    I can't compile it with nuitka (Infinite loading)
+    I can't compile it with nuitka (Mingw error)
 
     
 1. Clone the repository (Or download source code):
