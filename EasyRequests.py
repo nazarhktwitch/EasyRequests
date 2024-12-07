@@ -5,6 +5,9 @@ import requests
 
 SETTINGS_FILE = "settings.json"
 
+bloxwich
+
+
 LANGUAGES = {
     "en": {
         "welcome": "Welcome to EasyRequests!",
@@ -263,85 +266,83 @@ ARTS = {
     """
 }
 
+def save_settings(language, art_choice):
+    settings = {
+        "language": language,
+        "art_choice": art_choice
+    }
+    with open(SETTINGS_FILE, "w") as file:
+        json.dump(settings, file)
+    print(LANGUAGES[language]["config_saved"])
+
 def load_settings():
     try:
-        with open(SETTINGS_FILE, "r") as f:
-            return json.load(f)
+        with open(SETTINGS_FILE, "r") as file:
+            settings = json.load(file)
+        print(LANGUAGES[settings["language"]]["load_config"])
+        return settings
     except FileNotFoundError:
         print(LANGUAGES["en"]["settings_file_not_found"])
-        return {
-            "language": "en",
-            "art": "classic"
-        }
+        return {"language": "en", "art_choice": "classic"}
 
-def save_settings(settings):
-    with open(SETTINGS_FILE, "w") as f:
-        json.dump(settings, f, indent=4)
-    print(LANGUAGES[settings["language"]]["config_saved"])
-
-def choose_language(settings):
-    print(LANGUAGES[settings["language"]]["choose_language"])
-    print("1. English\n2. Русский\n3. Українська\n4. 中文\n5. 日本語\n6. Français\n7. Español")
-    choice = input()
-    if choice == "1":
-        return "en"
-    elif choice == "2":
-        return "ru"
-    elif choice == "3":
-        return "uk"
-    elif choice == "4":
-        return "zh"
-    elif choice == "5":
-        return "ja"
-    elif choice == "6":
-        return "fr"
-    elif choice == "7":
-        return "es"
-    else:
-        print(LANGUAGES[settings["language"]]["invalid_choice"])
-        return settings["language"]
-
-def choose_ascii_art(settings):
-    print(LANGUAGES[settings["language"]]["choose_art"])
-    print("1. Classic\n2. Modern\n3. Retro")
-    choice = input()
-    if choice == "1":
-        return "classic"
-    elif choice == "2":
-        return "modern"
-    elif choice == "3":
-        return "retro"
-    else:
-        print(LANGUAGES[settings["language"]]["invalid_choice"])
-        return settings["art"]
-
-def print_welcome(settings):
-    print(LANGUAGES[settings["language"]]["welcome"])
-    print(LANGUAGES[settings["language"]]["choose_mode"])
-    for mode in LANGUAGES[settings["language"]]["modes"]:
-        print(mode)
+def show_ascii_art(art_choice):
+    print(ARTS[art_choice])
 
 def main():
     settings = load_settings()
+    language = settings["language"]
+    art_choice = settings["art_choice"]
+
+    print(LANGUAGES[language]["welcome"])
+    show_ascii_art(art_choice)
+
     while True:
-        print_welcome(settings)
-        choice = input()
+        print(LANGUAGES[language]["choose_mode"])
+        for mode in LANGUAGES[language]["modes"]:
+            print(mode)
+
+        choice = input(f"{LANGUAGES[language]['choose_mode']}: ")
+
         if choice == "1":
-            print(LANGUAGES[settings["language"]]["send_get"])
+            url = input(LANGUAGES[language]["enter_url"])
+            print(LANGUAGES[language]["send_get"])
+            response = requests.get(url)
+            print(LANGUAGES[language]["status_code"], response.status_code)
+            print(LANGUAGES[language]["response_body"], response.text)
+
         elif choice == "2":
-            print(LANGUAGES[settings["language"]]["send_post"])
+            url = input(LANGUAGES[language]["enter_url"])
+            post_data = input(LANGUAGES[language]["enter_post_data"])
+            print(LANGUAGES[language]["send_post"])
+            response = requests.post(url, data=json.loads(post_data))
+            print(LANGUAGES[language]["status_code"], response.status_code)
+            print(LANGUAGES[language]["response_body"], response.text)
+
         elif choice == "3":
-            print(LANGUAGES[settings["language"]]["brute_force"])
+            param_name = input(LANGUAGES[language]["enter_param_name"])
+            wordlist_path = input(LANGUAGES[language]["enter_wordlist"])
+            print(LANGUAGES[language]["brute_force"])
+            # Implement brute-force logic (omitted for brevity)
+
         elif choice == "4":
-            settings["language"] = choose_language(settings)
-            settings["art"] = choose_ascii_art(settings)
-            save_settings(settings)
-            print(LANGUAGES[settings["language"]]["restart_alert"])
+            print(LANGUAGES[language]["choose_language"])
+            for lang in LANGUAGES.keys():
+                print(f"{lang}")
+            new_language = input(LANGUAGES[language]["choose_language"])
+            if new_language in LANGUAGES:
+                settings["language"] = new_language
+                save_settings(new_language, art_choice)
+                print(LANGUAGES[new_language]["restart_alert"])
+                break
+            else:
+                print(LANGUAGES[language]["invalid_choice"])
+
         elif choice == "5":
-            print(LANGUAGES[settings["language"]]["exited"])
+            print(LANGUAGES[language]["exited"])
             break
+
         else:
-            print(LANGUAGES[settings["language"]]["invalid_choice"])
+            print(LANGUAGES[language]["invalid_choice"])
 
 if __name__ == "__main__":
     main()
