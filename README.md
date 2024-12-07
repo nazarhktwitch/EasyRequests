@@ -81,3 +81,7 @@ Feel free to fork the repository, make improvements, and create a pull request. 
 ## Contact
 
 For more information or inquiries, feel free to contact me at nazarburlan3@outlook.com.
+
+## Chinese and Japanese issue
+
+Chinese and Japanese translations are not showing correctly, and i can't fix that.
