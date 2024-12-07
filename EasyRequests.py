@@ -5,9 +5,6 @@ import requests
 
 SETTINGS_FILE = "settings.json"
 
-bloxwich
-
-
 LANGUAGES = {
     "en": {
         "welcome": "Welcome to EasyRequests!",
