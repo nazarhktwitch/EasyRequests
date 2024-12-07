@@ -11,7 +11,6 @@ setup(
         "build_exe": {
             "packages": packages,
             "includes": includes,
-            "include_files": include_files,
         }
     },
     executables=[Executable("EasyRequests.py", base=None)]
