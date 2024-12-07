@@ -8,45 +8,6 @@ This is a Python application that supports multiple languages and includes vario
 - Simple and interactive menu system.
 
 ## Installation
-
-You can download latest release or compile itself (Reccomended).
-
-Compiling into exe:
-
-Using setup.py:
-
-    1. Run (If you don't have cx_freeze):
-    
-    pip install cx_freeze
-
-    2. Run in a project folder:
-    
-    python setup.py build
-
-    3. After done go to build/[folder-name, example: exe.win-amd64-3.12] and you can start program
-
-Using PyInstaller:
-
-    1. Run (If you don't have PyInstaller):
-
-    pip install pyinstaller
-
-    2. Run in a project folder:
-
-    pyinstaller --onefile --clean --strip --exclude-module test --exclude-module unused_module --name "EasyRequests" EasyRequests.py
-
-    Or use your custom command
-
-    3. Go to dist folder and run EasyRequests.exe
-
-Using Py2Exe:
-
-    Not avaible rn because of my python version incompatibility (>3.10)
-
-Nuitka:
-
-    I can't compile it with nuitka (Mingw error)
-
     
 1. Clone the repository (Or download source code):
     
