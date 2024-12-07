@@ -9,7 +9,7 @@ __pycache__/
 # Distribution / packaging
 .Python
 build/
-build\ (PyInstaller)
+"build (PyInstaller)/"
 develop-eggs/
 dist/
 downloads/
