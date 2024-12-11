@@ -1,16 +1,39 @@
 # -*- coding: utf-8 -*-
 
+import os
+import logging
 import json
 import requests
+import traceback
+from datetime import datetime
 
 SETTINGS_FILE = "settings.json"
+LOGS_DIR = "logs"
+
+if not os.path.exists(LOGS_DIR):
+    os.makedirs(LOGS_DIR)
+
+log_filename = os.path.join(LOGS_DIR, f"easyrequests_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.log")
+logging.basicConfig(
+    filename=log_filename,
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+
+crash_log_filename = os.path.join(LOGS_DIR, "log.txt")
+crash_logger = logging.getLogger("crashLogger")
+crash_logger.setLevel(logging.ERROR)
+crash_handler = logging.FileHandler(crash_log_filename)
+crash_handler.setFormatter(logging.Formatter('%(asctime)s - %(message)s'))
+crash_logger.addHandler(crash_handler)
 
 LANGUAGES = {
     "en": {
         "welcome": "Welcome to EasyRequests!",
         "enter_url": "Enter URL (e.g., https://example.com):",
-        "choose_mode": "Choose mode:",
+        "choose_mode": "Choose mode",
         "choose_language": "Choose language: ",
+        "choose_art": "Choose art: ",
         "modes": [
             "1. Send GET request",
             "2. Send POST request",
@@ -41,7 +64,8 @@ LANGUAGES = {
     "ru": {
         "welcome": "Добро пожаловать в EasyRequests!",
         "enter_url": "Введите URL (например, https://example.com):",
-        "choose_mode": "Выберите режим:",
+        "choose_mode": "Выберите режим",
+        "choose_art": "Выберите арт: ",
         "modes": [
             "1. Отправить GET-запрос",
             "2. Отправить POST-запрос",
@@ -72,7 +96,8 @@ LANGUAGES = {
     "uk": {
         "welcome": "Ласкаво просимо до EasyRequests!",
         "enter_url": "Введіть URL (наприклад, https://example.com):",
-        "choose_mode": "Оберіть режим:",
+        "choose_mode": "Оберіть режим",
+        "choose_art": "Виберіть арт: ",
         "modes": [
             "1. Відправити GET-запит",
             "2. Відправити POST-запит",
@@ -103,7 +128,7 @@ LANGUAGES = {
     "zh": {
         "welcome": "欢迎使用 EasyRequests！",
         "enter_url": "请输入 URL（例如：https://example.com）：",
-        "choose_mode": "选择模式：",
+        "choose_mode": "选择模式",
         "modes": [
             "1. 发送 GET 请求",
             "2. 发送 POST 请求",
@@ -165,7 +190,7 @@ LANGUAGES = {
     "fr": {
         "welcome": "Bienvenue dans EasyRequests !",
         "enter_url": "Entrez l'URL (par exemple, https://example.com) :",
-        "choose_mode": "Choisissez le mode :",
+        "choose_mode": "Choisissez le mode",
         "modes": [
             "1. Envoyer une requête GET",
             "2. Envoyer une requête POST",
@@ -196,7 +221,7 @@ LANGUAGES = {
     "es": {
         "welcome": "¡Bienvenido a EasyRequests!",
         "enter_url": "Ingrese URL (por ejemplo, https://example.com):",
-        "choose_mode": "Elige el modo:",
+        "choose_mode": "Elige el modo",
         "modes": [
             "1. Enviar solicitud GET",
             "2. Enviar solicitud POST",
@@ -228,40 +253,31 @@ LANGUAGES = {
 
 ARTS = {
     "classic": r"""
-         _            _                  _      _        _          _           _            _       _                  _           _          _          _        
-        /\ \         / /\               / /\   /\ \     /\_\       /\ \        /\ \         /\ \    /\_\               /\ \        / /\       /\ \       / /\      
-       /  \ \       / /  \             / /  \  \ \ \   / / /      /  \ \      /  \ \       /  \ \  / / /         _    /  \ \      / /  \      \_\ \     / /  \     
-      / /\ \ \     / / /\ \           / / /\ \__\ \ \_/ / /      / /\ \ \    / /\ \ \     / /\ \ \ \ \ \__      /\_\ / /\ \ \    / / /\ \__   /\__ \   / / /\ \__  
-     / / /\ \_\   / / /\ \ \         / / /\ \___\\ \___/ /      / / /\ \_\  / / /\ \_\   / / /\ \ \ \ \___\    / / // / /\ \_\  / / /\ \___\ / /_ \ \ / / /\ \___\ 
-    / /_/_ \/_/  / / /  \ \ \        \ \ \ \/___/ \ \ \_/      / / /_/ / / / /_/_ \/_/  / / /  \ \_\ \__  /   / / // /_/_ \/_/  \ \ \ \/___// / /\ \ \\ \ \ \/___/ 
-   / /____/\    / / /___/ /\ \        \ \ \        \ \ \      / / /__\/ / / /____/\    / / / _ / / / / / /   / / // /____/\      \ \ \     / / /  \/_/ \ \ \       
-  / /\____\/   / / /_____/ /\ \   _    \ \ \        \ \ \    / / /\ \ \  / / /______  / / /__\ \ \/ / / /___/ / // / /______ /_/\__/ / /  / / /    /_/\__/ / /      
- / / /______  / /_________/\ \ \ /_/\__/ / /         \ \_\/ / /  \ \ \/ / /_______\/ / /____\ \ \/ / /____\/ // / /_______\\ \/___/ /  /_/ /     \ \/___/ /       
-/ / /_______\/ / /_       __\ \_\\ \/___/ /           \/_/\/_/    \_\/\/__________/\/________\_\/\/_________/ \/__________/ \_____\/   \_\/       \_____\/        
-                                                                                                                                                                    
+ _____               ______                           _       
+|  ___|              | ___ \                         | |      
+| |__  __ _ ___ _   _| |_/ /___  __ _ _   _  ___  ___| |_ ___ 
+|  __|/ _` / __| | | |    // _ \/ _` | | | |/ _ \/ __| __/ __|
+| |__| (_| \__ \ |_| | |\ \  __/ (_| | |_| |  __/\__ \ |_\__ \
+\____/\__,_|___/\__, \_| \_\___|\__, |\__,_|\___||___/\__|___/
+                 __/ |             | |                        
+                |___/              |_|                        
     """,
     "modern": r"""
- _______  _______  _______           _______  _______  _______           _______  _______ _________ _______ 
-(  ____ \(  ___  )(  ____ \|\     /|(  ____ )(  ____ \(  ___  )|\     /|(  ____ \(  ____ \\__   __/(  ____ \
-| (    \/| (   ) || (    \/( \   / )| (    )|| (    \/| (   ) || )   ( || (    \/| (    \/   ) (   | (    \/
-| (__    | (___) || (_____  \ (_) / | (____)|| (__    | |   | || |   | || (__    | (_____    | |   | (_____ 
-|  __)   |  ___  |(_____  )  \   /  |     __)|  __)   | |   | || |   | ||  __)   (_____  )   | |   (_____  )
-| (      | (   ) |      ) |   ) (   | (\ (   | (      | | /\| || |   | || (            ) |   | |         ) |
-| (____/\| )   ( |/\____) |   | |   | ) \ \__| (____/\| (_\ \ || (___) || (____/\/\____) |   | |   /\____) |
-(_______/|/     \|\_______)   \_/   |/   \__/(_______/(____\/_)(_______)(_______/\_______)   )_(   \_______)
-                                                                                                            
-    """,
-    "retro": r"""
- _______   ________  ________       ___    ___ ________  _______   ________  ___  ___  _______   ________  _________  ________      
-|\  ___ \ |\   __  \|\   ____\     |\  \  /  /|\   __  \|\  ___ \ |\   __  \|\  \|\  \|\  ___ \ |\   ____\|\___   ___\\   ____\     
-\ \   __/|\ \  \|\  \ \  \___|_    \ \  \/  / | \  \|\  \ \   __/|\ \  \|\  \ \  \\\  \ \   __/|\ \  \___|\|___ \  \_\ \  \___|_    
- \ \  \_|  \ \  \\\  \ \_____  \    \ \    / / / \ \   __  \ \  \_| \ \  \\\  \ \   __  \ \  \_|  \ \  \___     \ \  \   \ \_____  \  
-  \ \  \     \ \  \\\  \|____|\  \    \ \__/ / /   \ \  \ \  \ \____ \ \   __  \ \  \ \  \ \  \    \ \  \    ___ \ \  \   \|____|\  \ 
-   \ \__\     \ \_______\____\_\  \    \|__|/ /     \ \__\ \_______\ \__\ \  \ \ \__\ \  \ \__\    \ \__\  |\___\ \ \__\    \____\_\  \\
-    \|__|      \|_______|\_______\|     \|__|/       \|__|\|_______| \|__|  \| |__| |  |___|     \|__|  \|___|  \|__|    \|________|  
-                                                                                         
+___________                     __________                                     __          
+\_   _____/____    _________.__.\______   \ ____  ________ __   ____   _______/  |_  ______
+ |    __)_\__  \  /  ___<   |  | |       _// __ \/ ____/  |  \_/ __ \ /  ___/\   __\/  ___/
+ |        \/ __ \_\___ \ \___  | |    |   \  ___< <_|  |  |  /\  ___/ \___ \  |  |  \___ \ 
+/_______  (____  /____  >/ ____| |____|_  /\___  >__   |____/  \___  >____  > |__| /____  >
+        \/     \/     \/ \/             \/     \/   |__|           \/     \/            \/ 
     """
 }
+
+def add_url_prefix(url):
+    prefixes = ["https://", "http://", "https://www.", "http://www.", "www."]
+    for prefix in prefixes:
+        if url.startswith(prefix):
+            return url
+    return "https://" + url
 
 def save_settings(language, art_choice):
     settings = {
@@ -270,15 +286,22 @@ def save_settings(language, art_choice):
     }
     with open(SETTINGS_FILE, "w") as file:
         json.dump(settings, file)
+    logging.info("Settings saved")
     print(LANGUAGES[language]["config_saved"])
 
 def load_settings():
     try:
         with open(SETTINGS_FILE, "r") as file:
             settings = json.load(file)
-        print(LANGUAGES[settings["language"]]["load_config"])
+        logging.info("Settings loaded successfully")
+
+        if "art_choice" not in settings:
+            settings["art_choice"] = "classic"
+            save_settings(settings["language"], settings["art_choice"])
+
         return settings
     except FileNotFoundError:
+        logging.warning("Settings file not found, using defaults.")
         print(LANGUAGES["en"]["settings_file_not_found"])
         return {"language": "en", "art_choice": "classic"}
 
@@ -300,46 +323,69 @@ def main():
 
         choice = input(f"{LANGUAGES[language]['choose_mode']}: ")
 
-        if choice == "1":
-            url = input(LANGUAGES[language]["enter_url"])
-            print(LANGUAGES[language]["send_get"])
-            response = requests.get(url)
-            print(LANGUAGES[language]["status_code"], response.status_code)
-            print(LANGUAGES[language]["response_body"], response.text)
+        try:
+            if choice == "1":
+                url = input(LANGUAGES[language]["enter_url"])
+                url = add_url_prefix(url)
+                print(LANGUAGES[language]["send_get"])
+                response = requests.get(url)
+                logging.info(f"GET request sent to {url} with status code {response.status_code}")
+                print(LANGUAGES[language]["status_code"], response.status_code)
+                print(LANGUAGES[language]["response_body"], response.text)
 
-        elif choice == "2":
-            url = input(LANGUAGES[language]["enter_url"])
-            post_data = input(LANGUAGES[language]["enter_post_data"])
-            print(LANGUAGES[language]["send_post"])
-            response = requests.post(url, data=json.loads(post_data))
-            print(LANGUAGES[language]["status_code"], response.status_code)
-            print(LANGUAGES[language]["response_body"], response.text)
+            elif choice == "2":
+                url = input(LANGUAGES[language]["enter_url"])
+                url = add_url_prefix(url)
+                post_data = input(LANGUAGES[language]["enter_post_data"])
+                print(LANGUAGES[language]["send_post"])
+                
+                try:
+                    post_data = json.loads(post_data)
+                    response = requests.post(url, data=post_data)
+                    logging.info(f"POST request sent to {url} with status code {response.status_code}")
+                    print(LANGUAGES[language]["status_code"], response.status_code)
+                    print(LANGUAGES[language]["response_body"], response.text)
+                except json.JSONDecodeError:
+                    print("Invalid JSON format. Please enter valid JSON data.")
 
-        elif choice == "3":
-            param_name = input(LANGUAGES[language]["enter_param_name"])
-            wordlist_path = input(LANGUAGES[language]["enter_wordlist"])
-            print(LANGUAGES[language]["brute_force"])
-            # Implement brute-force logic (omitted for brevity)
+            elif choice == "3":
+                param_name = input(LANGUAGES[language]["enter_param_name"])
+                wordlist_path = input(LANGUAGES[language]["enter_wordlist"])
+                print(LANGUAGES[language]["brute_force"])
 
-        elif choice == "4":
-            print(LANGUAGES[language]["choose_language"])
-            for lang in LANGUAGES.keys():
-                print(f"{lang}")
-            new_language = input(LANGUAGES[language]["choose_language"])
-            if new_language in LANGUAGES:
-                settings["language"] = new_language
-                save_settings(new_language, art_choice)
-                print(LANGUAGES[new_language]["restart_alert"])
+            elif choice == "4":
+                print(LANGUAGES[language]["choose_language"])
+                for lang in LANGUAGES.keys():
+                    print(f"{lang}")
+                new_language = input(LANGUAGES[language]["choose_language"])
+                if new_language in LANGUAGES:
+                    settings["language"] = new_language
+                    print(LANGUAGES[new_language]["restart_alert"])
+                else:
+                    print(LANGUAGES[language]["invalid_choice"])
+                print(LANGUAGES[language]["choose_art"])
+                for art in ARTS.keys():
+                    print(f"{art}")
+                new_art = input(LANGUAGES[language]["choose_art"])
+                if new_art in ARTS:
+                    settings["art_choice"] = new_art
+                    save_settings(new_language, art_choice)
+                else:
+                    print(LANGUAGES[language]["invalid_choice"])
+
+            elif choice == "5":
+                print(LANGUAGES[language]["exited"])
                 break
+
             else:
                 print(LANGUAGES[language]["invalid_choice"])
 
-        elif choice == "5":
-            print(LANGUAGES[language]["exited"])
+        except Exception as e:
+            error_message = f"An error occurred: {e}\n{traceback.format_exc()}"
+            crash_logger.error(error_message)
+            logging.error(error_message)
+            print(f"{LANGUAGES[language]['invalid_choice']} - Error logged.")
             break
-
-        else:
-            print(LANGUAGES[language]["invalid_choice"])
 
 if __name__ == "__main__":
     main()
